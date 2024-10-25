@@ -8,26 +8,33 @@ const Slider = () => {
   const { data } = useData();
   const [index, setIndex] = useState(0);
 
-  /* 
-  Problem 1: The data is not sorted by date
-  const byDateDesc = data?.focus.sort((evtA, evtB) =>
-  new Date(evtA.date) < new Date(evtB.date) ? -1 : 1
-  );
- */
-
+  /* Problem 1: The data is not sorted by date */
+  /* const byDateDesc = data?.focus.sort((evtA, evtB) =>
+    new Date(evtA.date) > new Date(evtB.date) ? -1 : 1
+  ); */
 
   const byDateDesc =
-    data?.focus.sort(
-      (evtA, evtB) => new Date(evtB.date) - new Date(evtA.date)
-    ) || [];
+    data?.focus
+      .slice()
+      .sort((evtA, evtB) => new Date(evtB.date) - new Date(evtA.date)) || [];
 
+  console.log("byDAteDesc****", byDateDesc);
 
-  const nextCard = () => {
+  /* const nextCard = () => {
     setTimeout(() => setIndex(index < byDateDesc.length ? index + 1 : 0), 5000);
   };
   useEffect(() => {
     nextCard();
   });
+ */
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setIndex((prevIndex) => (prevIndex + 1) % byDateDesc.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [byDateDesc.length]);
 
   return (
     <div className="SlideCardList">
