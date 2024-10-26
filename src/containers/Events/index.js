@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EventCard from "../../components/EventCard";
 import Select from "../../components/Select";
 import { useData } from "../../contexts/DataContext";
@@ -11,34 +11,50 @@ const PER_PAGE = 9;
 
 const EventList = () => {
   const { data, error } = useData();
-  const [type, setType] = useState();
+  const [type, setType] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
 
-  const filteredEvents = ((!type ? data?.events : data?.events) || []).filter(
-    (event, index) => {
-      if (
-        (currentPage - 1) * PER_PAGE <= index &&
-        PER_PAGE * currentPage > index
-      ) {
-        return true;
-      }
-      return false;
-    }
+  // Filter events based on 'type'
+  const events = !type
+    ? data?.events || []
+    : data?.events.filter((event) => event.type === type);
+
+  // Apply pagination
+  const filteredEvents = events.slice(
+    (currentPage - 1) * PER_PAGE,
+    currentPage * PER_PAGE
   );
 
-  console.log("filteredevent***", filteredEvents);
+  console.log("type***", type);
+  console.log("events***", events);
+  console.log("filteredEvents***", filteredEvents);
 
-  const changeType = (evtType) => {
+  // Calculate total pages
+  const pageNumber = Math.ceil(events.length / PER_PAGE);
+
+  // Create a set of event types, filtering out undefined or null types
+  const typeList = new Set(
+    data?.events
+      .map((event) => event.type)
+      .filter((eventType) => eventType !== undefined && eventType !== null)
+  );
+  console.log("typeList:", Array.from(typeList));
+
+  useEffect(() => {
+    if (currentPage > pageNumber) {
+      setCurrentPage(1);
+    }
+  }, [currentPage, type, pageNumber]);
+
+  const changeType = (selectedType) => {
+    console.log("changeType called with selectedType:", selectedType);
     setCurrentPage(1);
-    setType(evtType);
+    setType(selectedType);
   };
-
-  const pageNumber = Math.floor((filteredEvents?.length || 0) / PER_PAGE) + 1;
-  const typeList = new Set(data?.events.map((event) => event.type));
 
   return (
     <>
-      {error && <div>An error occured</div>}
+      {error && <div>An error occurred</div>}
       {data === null ? (
         "loading"
       ) : (
@@ -46,7 +62,10 @@ const EventList = () => {
           <h3 className="SelectTitle">Catégories</h3>
           <Select
             selection={Array.from(typeList)}
-            onChange={(value) => (value ? changeType(value) : changeType(null))}
+            onChange={(value) => {
+              console.log("Select onChange called with value:", value);
+              changeType(value || null);
+            }}
           />
           <div id="events" className="ListContainer">
             {filteredEvents.map((event) => (
@@ -64,9 +83,12 @@ const EventList = () => {
             ))}
           </div>
           <div className="Pagination">
-            {[...Array(pageNumber || 0)].map((_, n) => (
-              // eslint-disable-next-line react/no-array-index-key
-              <a key={n} href="#events" onClick={() => setCurrentPage(n + 1)}>
+            {[...Array(pageNumber)].map((_, n) => (
+              <a
+                key={`page-${n + 1}`}
+                href="#events"
+                onClick={() => setCurrentPage(n + 1)}
+              >
                 {n + 1}
               </a>
             ))}
