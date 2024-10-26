@@ -18,7 +18,7 @@ const Slider = () => {
       .slice()
       .sort((evtA, evtB) => new Date(evtB.date) - new Date(evtA.date)) || [];
 
-  console.log("byDAteDesc****", byDateDesc);
+  /* console.log("byDAteDesc****", byDateDesc); */
 
   /* const nextCard = () => {
     setTimeout(() => setIndex(index < byDateDesc.length ? index + 1 : 0), 5000);
@@ -60,9 +60,9 @@ const Slider = () => {
 
       <div className="SlideCard__paginationContainer">
         <div className="SlideCard__pagination">
-          {byDateDesc.map((_, radioIdx) => (
+          {byDateDesc.map((evt, radioIdx) => (
             <input
-              key={`radio-${byDateDesc[radioIdx].id}`}
+              key={`radio-${evt.id || radioIdx}`}
               type="radio"
               name="radio-button"
               checked={index === radioIdx}
