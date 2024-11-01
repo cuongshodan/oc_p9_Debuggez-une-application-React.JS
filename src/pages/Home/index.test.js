@@ -24,21 +24,27 @@ describe("When Form is created", () => {
       await screen.findByText("Message envoyé !");
     });
   });
-
 });
-
 
 describe("When a page is created", () => {
   it("a list of events is displayed", () => {
-    // to implement
-  })
+    render(<Home />);
+
+    expect(screen.queryByText("#DigitonPARIS")).not.toBeInTheDocument();
+  });
   it("a list a people is displayed", () => {
-    // to implement
-  })
+    render(<Home />);
+    const peopleCEO = screen.getByText("CEO");
+    expect(peopleCEO).toBeInTheDocument();
+  });
   it("a footer is displayed", () => {
-    // to implement
-  })
+    render(<Home />);
+    const footer = screen.getByText("Contactez-nous");
+    expect(footer).toBeInTheDocument();
+  });
   it("an event card, with the last event, is displayed", () => {
-    // to implement
-  })
+    render(<Home />);
+    const cardElement = screen.getByTestId("card-testid");
+    expect(cardElement.className.includes("EventCard--small")).toEqual(true);
+  });
 });
